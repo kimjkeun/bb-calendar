@@ -37,6 +37,21 @@ const actualWorkouts = {
     11: [2, 3, 6, 7, 9, 10, 13, 14, 16, 17, 20, 21, 23, 24, 27, 28, 31]
 };
 
+const events = {
+    "2026-03-14": "부천시의회 의장기 배드민턴대회",
+    "2026-03-15": "부천시의회 의장기 배드민턴대회",
+    "2026-05-09": "부천시협회장기 배드민턴대회",
+    "2026-05-10": "부천시협회장기 배드민턴대회",
+    "2026-06-20": "전국대회",
+    "2026-06-21": "전국대회",
+    "2026-08-29": "부천시 판타지아 전국대회",
+    "2026-08-30": "부천시 판타지아 전국대회",
+    "2026-09-19": "전국대회",
+    "2026-09-20": "전국대회",
+    "2026-10-24": "부천시장기 배드민턴대회",
+    "2026-10-25": "부천시장기 배드민턴대회"
+};
+
 const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
 const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -89,21 +104,33 @@ function generateCalendar(year) {
                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
                     const isHoliday = holidays[dateStr];
                     const isWorkout = actualWorkouts[month].includes(date);
+                    const isEvent = events[dateStr];
 
                     if (j === 0) dayDiv.classList.add('sun');
                     if (j === 6) dayDiv.classList.add('sat');
 
-                    if (isHoliday && isWorkout) {
+                    let tooltips = [];
+                    if (isEvent) {
+                        dayDiv.classList.add('event');
+                        tooltips.push(`🏆 ${isEvent}`);
+                    }
+                    if (isWorkout) {
                         const timeStr = j === 0 ? "14:00~17:00" : "18:00~21:00";
-                        dayDiv.classList.add('overlap');
-                        addTooltipListener(dayDiv, `🏸 운동(${timeStr}) & ${isHoliday}`);
-                    } else if (isHoliday) {
+                        if (isHoliday) {
+                            dayDiv.classList.add('overlap');
+                            tooltips.push(`🏸 운동(${timeStr})`);
+                        } else {
+                            dayDiv.classList.add('workout');
+                            tooltips.push(`🏸 운동 (${timeStr})`);
+                        }
+                    }
+                    if (isHoliday) {
                         dayDiv.classList.add('holiday');
-                        addTooltipListener(dayDiv, `${isHoliday}`);
-                    } else if (isWorkout) {
-                        const timeStr = j === 0 ? "14:00~17:00" : "18:00~21:00";
-                        dayDiv.classList.add('workout');
-                        addTooltipListener(dayDiv, `🏸 운동 (${timeStr})`);
+                        tooltips.push(isHoliday);
+                    }
+
+                    if (tooltips.length > 0) {
+                        addTooltipListener(dayDiv, tooltips.join(' & '));
                     }
 
                     cell.appendChild(dayDiv);
@@ -116,6 +143,48 @@ function generateCalendar(year) {
         }
         table.appendChild(tbody);
         monthCard.appendChild(table);
+
+        // 월별 대회 일정 추가
+        const monthEvents = [];
+        const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+        // 해당 월의 행사만 필터링
+        const items = Object.keys(events).filter(d => d.startsWith(monthPrefix)).sort();
+
+        // 중복 행사명 합치기 (예: 14일, 15일 같은 대회면 14~15일로 표시)
+        const groupedEvents = [];
+        items.forEach(dateStr => {
+            const title = events[dateStr];
+            const day = parseInt(dateStr.split('-')[2]);
+            const existing = groupedEvents.find(e => e.title === title);
+            if (existing) {
+                existing.days.push(day);
+            } else {
+                groupedEvents.push({ title, days: [day] });
+            }
+        });
+
+        if (groupedEvents.length > 0) {
+            const eventList = document.createElement('div');
+            eventList.className = 'month-events-list';
+
+            groupedEvents.forEach(e => {
+                const item = document.createElement('div');
+                item.className = 'month-event-item';
+
+                const dayRange = e.days.length > 1
+                    ? `${Math.min(...e.days)}~${Math.max(...e.days)}`
+                    : `${e.days[0]}`;
+
+                item.innerHTML = `
+                    <span class="month-event-date-badge">${dayRange}일</span>
+                    <span class="month-event-title">${e.title}</span>
+                `;
+                eventList.appendChild(item);
+            });
+            monthCard.appendChild(eventList);
+        }
+
         calendarGrid.appendChild(monthCard);
     }
 }

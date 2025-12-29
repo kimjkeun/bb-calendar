@@ -9,6 +9,8 @@
     /* Soft Red */
     --accent-overlap: #fbbf24;
     /* Amber */
+    --accent-event: #fbbf24;
+    /* Amber / Yellow */
     --glass-border: rgba(255, 255, 255, 0.1);
     --font-main: 'Outfit', 'Noto Sans KR', sans-serif;
 }
@@ -155,6 +157,11 @@ header {
     box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
 }
 
+.dot.event {
+    background-color: var(--accent-event);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
 #calendar-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -203,6 +210,38 @@ header {
     text-align: center;
 }
 
+.month-events-list {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.month-event-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
+
+.month-event-date-badge {
+    background: rgba(251, 191, 36, 0.15);
+    color: var(--accent-event);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.month-event-title {
+    color: var(--text-primary);
+    font-weight: 400;
+}
+
 .day {
     width: 32px;
     height: 32px;
@@ -233,6 +272,17 @@ header {
     color: var(--accent-holiday);
 }
 
+.day.workout,
+.day.overlap {
+    background: rgba(74, 222, 128, 0.15);
+    font-weight: 600;
+}
+
+.day.event {
+    color: var(--accent-event);
+    font-weight: 600;
+}
+
 .day.holiday {
     background: none;
     color: var(--accent-holiday);
@@ -240,7 +290,8 @@ header {
 
 .day.workout::after,
 .day.holiday::after,
-.day.overlap::after {
+.day.overlap::after,
+.day.event::after {
     content: '';
     position: absolute;
     bottom: 4px;
@@ -258,6 +309,15 @@ header {
 .day.holiday::after,
 .day.overlap::after {
     background: var(--accent-holiday);
+}
+
+.day.event::after {
+    background: var(--accent-event);
+}
+
+.day.workout.event::after {
+    background: var(--accent-event);
+    /* Event dot takes priority if both workout and event */
 }
 
 .day:hover.workout,
@@ -389,5 +449,9 @@ footer {
 
     .time-value {
         font-size: 0.9rem;
+    }
+
+    .month-event-item {
+        font-size: 0.75rem;
     }
 }
