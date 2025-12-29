@@ -283,8 +283,11 @@ header {
     font-weight: 600;
 }
 
-.day.holiday {
+.day.holiday:not(.workout):not(.overlap):not(.event) {
     background: none;
+}
+
+.day.holiday {
     color: var(--accent-holiday);
 }
 

@@ -66,10 +66,7 @@ function generateCalendar(year) {
 
         const monthHeader = document.createElement('div');
         monthHeader.className = 'month-name';
-
-        // 월 이름과 함께 총 운동 일수 표시
-        const workoutCount = actualWorkouts[month].length;
-        monthHeader.innerHTML = `${monthNames[month]} <span style="font-size: 0.8rem; font-weight: 400; color: var(--accent-workout); margin-left: 10px;">(총 ${workoutCount}회)</span>`;
+        monthHeader.textContent = monthNames[month];
         monthCard.appendChild(monthHeader);
 
         const table = document.createElement('table');
